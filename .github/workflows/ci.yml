@@ -1,0 +1,21 @@
+name: static checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # 這裡跑的**不是**那 596 條斷言——它們要 accoreconsole（AutoCAD 的無視窗核心），
+      # runner 上沒有。拿別的 Lisp 直譯器代跑會得到隔一層的證據，語意差一點綠燈就是假的。
+      # 所以 CI 只驗「在 runner 上真的驗得到」的：編碼、括號平衡、控制字元。
+      # 斷言怎麼跑寫在 README，指令是 tests/Run-CoreTests.ps1。
+      - run: python tools/check_lsp.py
